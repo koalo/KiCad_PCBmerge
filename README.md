@@ -2,6 +2,8 @@
 
 A python library for merging multiple KiCad PCBs
 
+<img src="snapshot.jpg" alt="LED Circle" width="400">
+
 Do not start this directly, instead use a merge script, for example
 
     from pcbnew import *
