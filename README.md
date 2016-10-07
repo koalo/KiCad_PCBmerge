@@ -1,20 +1,39 @@
 # KiCad_PCBmerge
 
-A python library for merging multiple KiCad PCBs
+A Python module for merging multiple KiCad PCBs
 
 <img src="snapshot.jpg" alt="LED Circle" width="400">
 
-Do not start this directly, instead use a merge script, for example
+By using this module you can merge multiple KiCad PCBs by aligning them at a common part.
+For example for merging a addon board to a base board and align them at a pin header use the following steps.
 
-    from pcbnew import *
-    import pcbmerge
+1. Create a KiCad PCB for the base PCB and add a pin header where the addon board shall be connected.
+2. Change the value of the pin header to a specific value, for example OUTPUT.
+2. Create a second PCB for the addon board and add a pin header for example with the name INPUT, too.
+3. Download the pcbmerge.py and create a Python script with the following content
 
-    mypcb = LoadBoard("main/main.kicad_pcb")
-    pcbmerge.merge(pcb = mypcb, 
-                   base_anchor = "MATCH_1", 
-                   addon_anchor = "MATCH", 
-                   filename = "addon/addon.kicad_pcb")
-    SaveBoard("output.kicad_pcb", mypcb)
+        #!/usr/bin/env python
+
+        from pcbnew import *
+        import pcbmerge
+
+        # Load the power board
+        mypcb = LoadBoard("NAME_OF_THE_BASE.kicad_pcb")
+
+        # Merge the power board with the led board
+        pcbmerge.merge(pcb = mypcb,
+                       base_anchor = "OUTPUT",
+                       addon_anchor = "INPUT",
+                       filename = "NAME_OF_THE_ADDON.kicad_pcb")
+
+        # Combine and refill areas
+        pcbmerge.combine_all_areas(mypcb)
+        pcbmerge.fill_all_areas(mypcb)
+
+        # Save output
+        SaveBoard("simple.kicad_pcb", mypcb)
+
+4. Execute the script and open the simple.kicad_pcb
 
 # License
 
