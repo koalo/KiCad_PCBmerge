@@ -79,6 +79,15 @@ def tempfilename():
         except OSError:
             pass
 
+def fill_all_zones(pcb):
+    for i in range(0, pcb.GetAreaCount()):
+        area = pcb.GetArea(i)
+        area.ClearFilledPolysList()
+        area.UnFill()
+        if area.GetIsKeepout():
+            continue
+        area.BuildFilledSolidAreasPolygons(pcb)
+
 def merge(pcb, base_anchor, addon_anchor, filename):
     base_anchor_module = find_module_by_value(pcb, base_anchor)
 
