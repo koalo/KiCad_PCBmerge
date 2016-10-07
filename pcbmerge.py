@@ -8,12 +8,16 @@
 # from pcbnew import *
 # import pcbmerge
 #
-# mypcb = LoadBoard("main/main.kicad_pcb")
-# pcbmerge.merge(pcb = mypcb, 
-#                base_anchor = "MATCH_1", 
-#                addon_anchor = "MATCH", 
-#                filename = "addon/addon.kicad_pcb")
-# SaveBoard("output.kicad_pcb", mypcb)
+# mypcb = LoadBoard("example_power/power.kicad_pcb")
+# pcbmerge.merge(pcb = mypcb,
+#                base_anchor = "OUTPUT",
+#                addon_anchor = "IN",
+#                filename = "example_led/led.kicad_pcb")
+# 
+# pcbmerge.combine_all_areas(mypcb)
+# pcbmerge.fill_all_areas(mypcb)
+#
+# SaveBoard("simple.kicad_pcb", mypcb)
 #
 #########################################################################
 #
@@ -79,7 +83,7 @@ def tempfilename():
         except OSError:
             pass
 
-def fill_all_zones(pcb):
+def fill_all_areas(pcb):
     for i in range(0, pcb.GetAreaCount()):
         area = pcb.GetArea(i)
         area.ClearFilledPolysList()
@@ -88,7 +92,11 @@ def fill_all_zones(pcb):
             continue
         area.BuildFilledSolidAreasPolygons(pcb)
 
-def merge(pcb, base_anchor, addon_anchor, filename):
+def combine_all_areas(pcb):
+    for i in range(0, pcb.GetNetCount()):
+        pcb.CombineAllAreasInNet(None, i, False)
+
+def merge(pcb, base_anchor, addon_anchor, filename, postfix = "-ADDON"):
     base_anchor_module = find_module_by_value(pcb, base_anchor)
 
     pcb_tmp = LoadBoard(filename)
@@ -107,7 +115,7 @@ def merge(pcb, base_anchor, addon_anchor, filename):
     new_netnames = {}
     for i in range(1, pcb_tmp.GetNetCount()): # 0 is unconnected net
         name = pcb_tmp.FindNet(i).GetNetname()
-        new_netnames[name] = name+"-"+base_anchor
+        new_netnames[name] = name+postfix
     
     for (a,b) in zip(base_anchor_module.Pads(), addon_anchor_module.Pads()):
         new_netnames[b.GetNet().GetNetname()] = a.GetNet().GetNetname()
